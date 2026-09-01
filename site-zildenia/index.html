@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Lanches — Pastel na chapa, chope na mesa</title>
+    <meta name="description" content="Pastéis artesanais feitos na hora e chope geladinho. Peça pelo cardápio online do La Lanches.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="icon" href="./img/Logo/logo1.png" type="image/png">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="#home" class="brand" data-nav="home">
+                <img src="./img/Logo/logo1.png" alt="La Lanches" class="brand-logo">
+                <span class="brand-name">La Lanches</span>
+            </a>
+
+            <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="main-nav">
+                <i class="fas fa-bars"></i>
+                <span class="sr-only">Abrir menu</span>
+            </button>
+
+            <nav class="main-nav" id="main-nav">
+                <ul>
+                    <li><a href="#home" class="nav-link active" data-nav="home">Início</a></li>
+                    <li><a href="#cardapio" class="nav-link" data-nav="cardapio">Cardápio</a></li>
+                    <li><a href="#carrinho" class="nav-link nav-link-cart" data-nav="carrinho">
+                        <i class="fas fa-receipt"></i> Carrinho
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="section active">
+
+            <div class="hero">
+                <div class="hero-text">
+                    <h1>Pastel na chapa,<br>chope na mesa.</h1>
+                    <p class="hero-lede">
+                        Massa esticada e frita na hora, recheio generoso e aquele chope bem gelado
+                        pra acompanhar. É comida de balcão, feita com o cuidado de receita de família
+                        — chama os amigos e puxa uma cadeira.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#cardapio" class="btn btn-primary" data-nav="cardapio">Ver cardápio</a>
+                        <a href="https://wa.me/5585999999999" target="_blank" rel="noopener" class="btn btn-ghost">
+                            <i class="fab fa-whatsapp"></i> Chamar no Whats
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hero-showcase" aria-hidden="false">
+                    <p class="showcase-caption">os mais pedidos da casa</p>
+                    <div class="showcase-stack">
+                        <figure class="showcase-photo showcase-photo-1">
+                            <img src="./img/Pasteis/pastelmistao.jpg" alt="Pastel Mistão">
+                            <span class="price-tag">R$ 10</span>
+                        </figure>
+                        <figure class="showcase-photo showcase-photo-2">
+                            <img src="./img/Pasteis/batatacombacon echedar.jpg" alt="Batata com bacon e cheddar">
+                            <span class="price-tag">R$ 28</span>
+                        </figure>
+                        <figure class="showcase-photo showcase-photo-3">
+                            <img src="./img/Pasteis/pasteltradiicona.jpg" alt="Pastel Tradicional">
+                            <span class="price-tag">R$ 5</span>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about">
+                <div class="about-copy">
+                    <h2>De onde viemos</h2>
+                    <p>
+                        Somos uma família que decidiu trazer pra rua o que sempre fizemos em casa:
+                        pastel de massa fina e crocante, recheio que não é mão-de-vaca, e aquele
+                        tempero de quem cozinha com carinho há anos.
+                    </p>
+                    <p>
+                        Não é fast-food e não é restaurante chique — é o boteco onde você senta,
+                        pede um chope e o pastel chega quentinho, do jeito que a vó fazia.
+                    </p>
+                </div>
+
+                <ul class="reasons">
+                    <li>
+                        <i class="fas fa-leaf"></i>
+                        <div><strong>Ingrediente de verdade</strong><span>Escolhido a dedo, sem economizar no recheio</span></div>
+                    </li>
+                    <li>
+                        <i class="fas fa-coins"></i>
+                        <div><strong>Preço justo</strong><span>Sem taxa escondida, sem pegadinha no final</span></div>
+                    </li>
+                    <li>
+                        <i class="fas fa-comments"></i>
+                        <div><strong>Atendimento de bairro</strong><span>A gente lembra do seu pedido de sempre</span></div>
+                    </li>
+                    <li>
+                        <i class="fas fa-broom"></i>
+                        <div><strong>Higiene em primeiro lugar</strong><span>Preparo cuidadoso, do balcão à sua mesa</span></div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="cardapio" class="section">
+            <div class="section-head">
+                <h2>Cardápio</h2>
+                <p>Escolha, adicione ao carrinho e finalize o pedido pelo WhatsApp.</p>
+            </div>
+
+            <div class="menu-tabs" id="menu-tabs">
+                <button class="tab-btn active" data-category="lanches">Pastéis</button>
+                <button class="tab-btn" data-category="bar">Pratos &amp; Petiscos</button>
+                <button class="tab-btn" data-category="bebidas">Bebidas</button>
+                <span class="tab-indicator" id="tab-indicator"></span>
+            </div>
+
+            <div class="menu-items" id="menu-items"></div>
+        </section>
+
+        <section id="carrinho" class="section">
+            <div class="section-head">
+                <h2>Sua comanda</h2>
+                <p>Confira os itens antes de fechar a conta.</p>
+            </div>
+
+            <div class="ticket">
+                <div class="ticket-items" id="cart-items">
+                    <p class="empty-cart">Sua comanda está vazia. Bora escolher um pastel?</p>
+                </div>
+                <div class="ticket-edge"></div>
+                <div class="ticket-total">
+                    <span>Total</span>
+                    <strong>R$ <span id="total-price">0,00</span></strong>
+                </div>
+                <button id="checkout-btn" class="btn btn-primary btn-block" disabled>
+                    <i class="fab fa-whatsapp"></i> Fechar pedido no WhatsApp
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-col">
+                <h3>La Lanches</h3>
+                <p><i class="fas fa-phone"></i> (85) 9 9999-9999</p>
+                <p><i class="fas fa-envelope"></i> contato@lalanches.com</p>
+            </div>
+            <div class="footer-col">
+                <h3>Funcionamento</h3>
+                <p>Segunda a sábado: 10h — 22h</p>
+                <p>Domingo: 11h — 20h</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 La Lanches. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="./js/script.js"></script>
+</body>
+</html>

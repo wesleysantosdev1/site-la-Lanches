@@ -19,7 +19,8 @@ const menuItems = {
             name: "Mistão",
             description: "Frango, Carne, Queijo, Presunto, Requeijão",
             price: 10.00,
-            image: "./img/Pasteis/pastelmistao.jpg"
+            image: "./img/Pasteis/pastelmistao.jpg",
+            popular: true
         },
         {
             id: 4,
@@ -40,7 +41,8 @@ const menuItems = {
             name: "Batata com Bacon e Cheddar",
             description: "Batata frita com bacon crocante e cheddar derretido",
             price: 28.00,
-            image: "./img/Pasteis/batatacombacon echedar.jpg"
+            image: "./img/Pasteis/batatacombacon echedar.jpg",
+            popular: true
         }
     ],
     bar: [
@@ -68,9 +70,10 @@ const menuItems = {
         {
             id: 10,
             name: "Feijoada Rainha",
-            description: "Acompanha Calabresa, feijão preto, arroz, coentro, eucalipto, farofa.",
+            description: "Acompanha calabresa, feijão preto, arroz, couve, farofa",
             price: 38.00,
-            image: "./img/Almoco/feijioada.jpg"
+            image: "./img/Almoco/feijioada.jpg",
+            popular: true
         }
     ],
     bebidas: [
@@ -119,268 +122,248 @@ const menuItems = {
     ]
 };
 
-// Variáveis globais
 let cart = [];
 let currentCategory = 'lanches';
 
-// DOM Elements
-const menuItemsContainer = document.querySelector('.menu-items');
-const cartItemsContainer = document.querySelector('.cart-items');
+const menuItemsContainer = document.getElementById('menu-items');
+const cartItemsContainer = document.getElementById('cart-items');
 const cartCountElement = document.getElementById('cart-count');
 const totalPriceElement = document.getElementById('total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
 const tabButtons = document.querySelectorAll('.tab-btn');
-const navLinks = document.querySelectorAll('.nav-link');
+const tabIndicator = document.getElementById('tab-indicator');
+const navLinks = document.querySelectorAll('[data-nav]');
 const sections = document.querySelectorAll('.section');
+const navToggle = document.getElementById('nav-toggle');
+const mainNav = document.getElementById('main-nav');
 
-// Função para renderizar os itens do menu
+function formatPrice(value) {
+    return value.toFixed(2).replace('.', ',');
+}
+
+function moveTabIndicator(button) {
+    if (!tabIndicator || !button) return;
+    tabIndicator.style.left = button.offsetLeft + 'px';
+    tabIndicator.style.width = button.offsetWidth + 'px';
+}
+
 function renderMenuItems(category) {
     if (!menuItemsContainer) return;
-    
+
     menuItemsContainer.innerHTML = '';
-    
+
     menuItems[category].forEach(item => {
-        const menuItemElement = document.createElement('div');
-        menuItemElement.classList.add('menu-item');
-        
-        menuItemElement.innerHTML = `
-            <img src="${item.image || 'imagens/default.jpg'}" alt="${item.name}">
+        const el = document.createElement('div');
+        el.classList.add('menu-item');
+
+        el.innerHTML = `
+            <div class="menu-item-media">
+                <img src="${item.image}" alt="${item.name}">
+                ${item.popular ? '<span class="badge-popular">Mais pedido</span>' : ''}
+                <span class="price-tag">R$ ${formatPrice(item.price)}</span>
+            </div>
             <div class="menu-item-content">
                 <h3>${item.name}</h3>
                 <p>${item.description}</p>
-                <span class="price">R$ ${item.price.toFixed(2)}</span>
-                <button class="add-to-cart" data-id="${item.id}">Adicionar ao Carrinho</button>
+                <button class="add-to-cart" data-id="${item.id}">
+                    <i class="fas fa-plus"></i> Adicionar
+                </button>
             </div>
         `;
-        
-        menuItemsContainer.appendChild(menuItemElement);
+
+        menuItemsContainer.appendChild(el);
     });
-    
-    // Adiciona event listeners aos botões
+
     document.querySelectorAll('.add-to-cart').forEach(button => {
         button.addEventListener('click', addToCart);
     });
 }
 
-// Função para adicionar item ao carrinho
-function addToCart(e) {
-    const itemId = parseInt(e.target.getAttribute('data-id'));
-    let item = null;
-    
-    // Encontra o item em qualquer categoria
+function findItemById(itemId) {
     for (const category in menuItems) {
-        const foundItem = menuItems[category].find(i => i.id === itemId);
-        if (foundItem) {
-            item = foundItem;
-            break;
-        }
+        const found = menuItems[category].find(i => i.id === itemId);
+        if (found) return found;
     }
-    
+    return null;
+}
+
+function addToCart(e) {
+    const button = e.currentTarget;
+    const itemId = parseInt(button.getAttribute('data-id'));
+    const item = findItemById(itemId);
     if (!item) return;
-    
-    // Verifica se o item já está no carrinho
+
     const existingItem = cart.find(i => i.id === item.id);
-    
+
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
-        cart.push({
-            ...item,
-            quantity: 1
-        });
+        cart.push({ ...item, quantity: 1 });
     }
-    
+
     updateCart();
-    showNotification(`${item.name} adicionado ao carrinho!`);
+    showToast(`${item.name} adicionado à comanda!`);
 }
 
-// Função para remover item do carrinho
 function removeFromCart(itemId) {
     const itemIndex = cart.findIndex(item => item.id === itemId);
-    
-    if (itemIndex !== -1) {
-        if (cart[itemIndex].quantity > 1) {
-            cart[itemIndex].quantity -= 1;
-        } else {
-            cart.splice(itemIndex, 1);
-        }
-        
-        updateCart();
+    if (itemIndex === -1) return;
+
+    if (cart[itemIndex].quantity > 1) {
+        cart[itemIndex].quantity -= 1;
+    } else {
+        cart.splice(itemIndex, 1);
     }
+
+    updateCart();
 }
 
-// Função para atualizar o carrinho
 function updateCart() {
-    // Atualiza a contagem no ícone do carrinho
     const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
     if (cartCountElement) {
         cartCountElement.textContent = totalItems.toString();
+        cartCountElement.classList.remove('bump');
+        void cartCountElement.offsetWidth;
+        cartCountElement.classList.add('bump');
     }
-    
+
     if (!cartItemsContainer || !checkoutBtn || !totalPriceElement) return;
-    
-    // Renderiza os itens do carrinho
+
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart">Seu carrinho está vazio</p>';
+        cartItemsContainer.innerHTML = '<p class="empty-cart">Sua comanda está vazia. Bora escolher um pastel?</p>';
         checkoutBtn.disabled = true;
     } else {
         cartItemsContainer.innerHTML = '';
-        
+
         cart.forEach(item => {
-            const cartItemElement = document.createElement('div');
-            cartItemElement.classList.add('cart-item');
-            
-            cartItemElement.innerHTML = `
+            const el = document.createElement('div');
+            el.classList.add('cart-item');
+
+            el.innerHTML = `
                 <div class="cart-item-info">
                     <h4>${item.name}</h4>
-                    <p>R$ ${item.price.toFixed(2)} x ${item.quantity}</p>
+                    <p>R$ ${formatPrice(item.price)} x ${item.quantity}</p>
                 </div>
                 <div class="cart-item-actions">
-                    <button class="remove-item" data-id="${item.id}">-</button>
+                    <button class="remove-item" data-id="${item.id}" aria-label="Remover uma unidade">-</button>
                     <span>${item.quantity}</span>
-                    <button class="add-item" data-id="${item.id}">+</button>
+                    <button class="add-item" data-id="${item.id}" aria-label="Adicionar uma unidade">+</button>
                 </div>
             `;
-            
-            cartItemsContainer.appendChild(cartItemElement);
+
+            cartItemsContainer.appendChild(el);
         });
-        
-        // Adiciona event listeners aos botões
+
         document.querySelectorAll('.remove-item').forEach(button => {
             button.addEventListener('click', (e) => {
-                removeFromCart(parseInt(e.target.getAttribute('data-id')));
+                removeFromCart(parseInt(e.currentTarget.getAttribute('data-id')));
             });
         });
-        
+
         document.querySelectorAll('.add-item').forEach(button => {
             button.addEventListener('click', (e) => {
-                const itemId = parseInt(e.target.getAttribute('data-id'));
+                const itemId = parseInt(e.currentTarget.getAttribute('data-id'));
                 const item = cart.find(i => i.id === itemId);
-                
                 if (item) {
                     item.quantity += 1;
                     updateCart();
                 }
             });
         });
-        
+
         checkoutBtn.disabled = false;
     }
-    
-    // Atualiza o total
+
     const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    totalPriceElement.textContent = totalPrice.toFixed(2);
+    totalPriceElement.textContent = formatPrice(totalPrice);
 }
 
-// Função para mostrar notificação
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.classList.add('notification');
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.classList.add('toast');
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
     setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => {
-            notification.remove();
-        }, 500);
-    }, 3000);
+        toast.classList.add('toast-out');
+        setTimeout(() => toast.remove(), 400);
+    }, 2600);
 }
 
-// Event Listeners
-if (tabButtons) {
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Atualiza a aba ativa
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // Renderiza os itens da categoria selecionada
-            currentCategory = button.getAttribute('data-category') || 'lanches';
-            renderMenuItems(currentCategory);
-        });
+function goToSection(target) {
+    navLinks.forEach(l => l.classList.remove('active'));
+    document.querySelectorAll(`[data-nav="${target}"]`).forEach(l => l.classList.add('active'));
+
+    sections.forEach(section => {
+        section.classList.toggle('active', section.id === target);
     });
+
+    if (target === 'cardapio') {
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) moveTabIndicator(activeTab);
+    }
+
+    if (mainNav) {
+        mainNav.classList.remove('open');
+        navToggle?.setAttribute('aria-expanded', 'false');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-if (navLinks) {
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Atualiza o link ativo
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-            
-            // Mostra a seção correspondente
-            const target = link.getAttribute('href');
-            sections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === target.substring(1)) {
-                    section.classList.add('active');
-                }
-            });
-        });
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        moveTabIndicator(button);
+
+        currentCategory = button.getAttribute('data-category') || 'lanches';
+        renderMenuItems(currentCategory);
+    });
+});
+
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        goToSection(link.getAttribute('data-nav'));
+    });
+});
+
+if (navToggle && mainNav) {
+    navToggle.addEventListener('click', () => {
+        const isOpen = mainNav.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen.toString());
     });
 }
 
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
         if (cart.length === 0) return;
-        
-        // Monta a mensagem para o WhatsApp
+
         let message = `Olá, gostaria de fazer um pedido:\n\n`;
         message += `*Itens:*\n`;
-        
+
         cart.forEach(item => {
-            message += `- ${item.name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
+            message += `- ${item.name} (${item.quantity}x) - R$ ${formatPrice(item.price * item.quantity)}\n`;
         });
-        
-        message += `\n*Total: R$ ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}*`;
+
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        message += `\n*Total: R$ ${formatPrice(total)}*`;
         message += `\n\nNome: [Digite seu nome aqui]`;
         message += `\nEndereço: [Digite seu endereço aqui]`;
-        
-        // Codifica a mensagem para URL
+
         const encodedMessage = encodeURIComponent(message);
-        
-        // Abre o WhatsApp
-        window.open(`https://wa.me/558596251079?text=${encodedMessage}`, '_blank');
+        window.open(`https://wa.me/5585999999999?text=${encodedMessage}`, '_blank');
     });
 }
 
-// Inicialização
+window.addEventListener('resize', () => {
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) moveTabIndicator(activeTab);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     renderMenuItems(currentCategory);
-    
-    // Adiciona estilo para notificação
-    const style = document.createElement('style');
-    style.textContent = `
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .notification.fade-out {
-            animation: fadeOut 0.5s ease;
-            opacity: 0;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab) moveTabIndicator(activeTab);
 });
